@@ -29,7 +29,7 @@ def scrape():
         prime_online_gauge.set(get_online(soup.select('div.block12')[0]))
         asterios_online_gauge.set(get_online(soup.select('div.block2')[0]))
         hunter_online_gauge.set(get_online(soup.select('div.block4')[0]))
-        time.sleep(60 * 5 + random.randint(-30, 30))
+        time.sleep(60 * 5 + random.randint(-30, -2))
 
 
 def get_online(tag: Tag) -> int:
