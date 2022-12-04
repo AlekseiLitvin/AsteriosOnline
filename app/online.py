@@ -14,15 +14,6 @@ asterios_online_gauge = Gauge(name='asterios_online', documentation='Asterios x5
 hunter_online_gauge = Gauge(name='hunter_online', documentation='Hunter x55 online')
 
 
-def get_online(tag: Tag) -> int:
-    try:
-        online = tag.contents[1].contents[0].text.replace('Status:', '')
-        return int(online)
-    except:
-        print("Error during online parsing")
-        return 0
-
-
 class MyHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -38,7 +29,16 @@ def scrape():
         prime_online_gauge.set(get_online(soup.select('div.block12')[0]))
         asterios_online_gauge.set(get_online(soup.select('div.block2')[0]))
         hunter_online_gauge.set(get_online(soup.select('div.block4')[0]))
-        time.sleep(60)
+        time.sleep(60 * 5 + random.randint(-30, 30))
+
+
+def get_online(tag: Tag) -> int:
+    try:
+        online = tag.select('font')[0].text
+        return int(online)
+    except:
+        print("Error during online parsing")
+        return 0
 
 
 if __name__ == '__main__':
