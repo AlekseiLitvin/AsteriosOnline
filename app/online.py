@@ -22,14 +22,16 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
 
 def scrape():
     while True:
-        resp = requests.get('https://asterios.tm/index.php')
+        resp = requests.get('https://asterios.tm/static/status.en.html')
         soup = BeautifulSoup(resp.text, features='html.parser')
 
         pride_online_gauge.set(get_online(soup.select('div.block1')[0]))
         prime_online_gauge.set(get_online(soup.select('div.block12')[0]))
         asterios_online_gauge.set(get_online(soup.select('div.block2')[0]))
         hunter_online_gauge.set(get_online(soup.select('div.block4')[0]))
-        time.sleep(60 * 5 + random.randint(-30, -2))
+
+        print(get_online(soup.select('div.block2')[0]))
+        time.sleep(60 * 5 + random.randint(-45, -2))
 
 
 def get_online(tag: Tag) -> int:
