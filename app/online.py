@@ -7,6 +7,7 @@ import http.server
 
 import requests
 from bs4 import BeautifulSoup, Tag
+from requests import Response
 
 pride_online_gauge = Gauge(name='pride_online', documentation='Pride x1.5 online')
 prime_online_gauge = Gauge(name='prime_online', documentation='Prime x1 online')
@@ -22,7 +23,10 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
 
 def scrape():
     while True:
-        resp = requests.get('https://asterios.tm/static/status.en.html')
+        resp: Response = requests.get('https://asterios.tm/static/status.en.html', proxies=get_random_proxy(), timeout=10)
+        while resp.status_code != 200:
+            resp = requests.get('https://asterios.tm/static/status.en.html', proxies=get_random_proxy(), timeout=10)
+
         soup = BeautifulSoup(resp.text, features='html.parser')
 
         pride_online_gauge.set(get_online(soup.select('div.block1')[0]))
@@ -32,6 +36,18 @@ def scrape():
 
         print(get_online(soup.select('div.block2')[0]))
         time.sleep(60 * 5 + random.randint(-45, -2))
+
+
+def get_random_proxy() -> dict:
+    proxies = requests.get('https://raw.githubusercontent.com/saschazesiger/Free-Proxies/master/proxies/raw.txt')
+    split_list = proxies.text.split('\n')
+    proxy_ip = ''
+    while proxy_ip == '':
+        proxy_ip = random.choice(split_list)
+    proxies = {
+        'http': proxy_ip
+    }
+    return proxies
 
 
 def get_online(tag: Tag) -> int:
